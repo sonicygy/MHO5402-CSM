@@ -1,36 +1,54 @@
-# Kano Lab · 雙語卡諾模型課堂遊戲
+# KANO LAB · 顧客需要與卡諾模型課堂活動
 
 ## 課堂入口
 
 - 學生：https://sonicygy.github.io/MHO5402-CSM/
 - 投影／二維碼：https://sonicygy.github.io/MHO5402-CSM/classroom.html
-- 教師成績后台：https://kano-csm-teacher.sonic-acc.chatgpt.site
+- 教師成績後台：https://kano-csm-teacher.sonic-acc.chatgpt.site
 
-學生掃碼後輸入名字，選擇中文、英文或雙語，完成10題分類，並選任意兩題寫下理由，再按「提交給老師」。分類只計首次確認；理由可在最終提交前補寫或修改，成功提交後鎖定。無需學生帳號、班級或班級代碼。原有學生網址及二維碼保持不變。
+本資料夾是2026-10-14修訂來源；本地修改不等於已發布，線上版本須以整體驗證及發布紀錄為準。
 
-教師使用指定 ChatGPT 帳號登入后台，查看名字、分數、提交時間、每題答案和文字理由。后台每15秒更新，可匯出CSV。其他帳號與未登入訪客不能讀取成績。
+學生輸入名字後，以繁體中文（預設）或英文進行活動。頁首課程名稱為繁中「KANO LAB / MHO5302K 顧客服務管理」及英文「KANO LAB / MHO5302 Customer Service Management」。不設簡體中文或雙語顯示模式。
 
-## 課件用詞
+學習順序：01 概念圖解 → 02 情境練習 → 03 顧客問卷 → 04 學習紀錄。先看概念，再完成10題情境分類和全部4組顧客問卷，最後按「提交給老師」並等候確認。不需輸入文字作答，不提供換人、重玩或重新開始按鈕。
 
-卡諾模型 / Kano Model：M 必備 / Must-be；O 一維 / One-dimensional；A 魅力 / Attractive；I 無差異 / Indifferent；R 反向 / Reverse。
+## 情境題與顧客問卷
 
-用詞依 MHO5302 第四講中文與英文課件。Q 是待澄清的問卷結果，不是第六種需要。
+- 情境分類只計首次確認，滿分10分；確認後不能改寫分類。參考解釋與討論問題保留。
+- 顧客問卷包括免費 Wi-Fi、免費提早入住、自助入住選項，以及入住後每日推廣通知。每項屬性均須選擇「提供」和「不提供」時的反應，4組共8個選項全部必填。
+- 問卷是顧客喜好，不計對錯，也不計入10分制情境分數。M／O／A／I／R／Q 均可由矩陣得出；Q 是待澄清結果，不是第六種顧客需要。
+- 轉換屬性或語言、重新整理同一頁籤時，已選反應保留。問卷與情境進度按同一次練習保存；只有實際練習識別碼改變時才重設。
+- 學習紀錄顯示問卷完成數（0/4至4/4），可直接前往第一組未完成問卷。10題情境及4組問卷全部完成後才可提交。
+- 成功提交後，本次情境結果與問卷均鎖定。學生頁只在收到伺服器確認後顯示成功；網絡失敗可重試同一次提交。
 
-## 成績與保存
+## 儲存與資料格式
 
-- 每題只計首次確認的分類答案，滿分10分。服務分類依題中顧客、承諾和情境判讀。
-- 題目回饋和討論在學生頁顯示；文字理由不自動評分。
-- 學生練習進度暫存在瀏覽器，名字與成績保存在獨立的 Sites D1 数据库；學生資料不存放在此公開倉庫。
-- 網頁收到服务器確認後才顯示提交成功。網絡失敗時可重試同一份答案，不會新增重複提交；已提交的首次結果不能被改寫。
-- 點「換人／再玩一次」可開始一份新紀錄；同名者的不同嘗試會分別列出。
-- 登記僅填名字，不驗證學生身份，適用於課堂遊戲。
-- 線上名字登記及提交需要網絡；原有本地單檔HTML另行保留，用於離線練習。
+課堂期間請保留原頁籤。情境與問卷進度保存在目前瀏覽器；本次練習憑證沿用頁籤的工作階段儲存方式。登記只填名字，不驗證學生身份，無需學生帳號、班級或班級代碼。網址及二維碼保持不變。
+
+`POST /api/start` 傳送 `name` 與目前介面語言 `language`（`zh` 或 `en`）。`POST /api/submit` 傳送原有 `id`、`token`、情境 `answers`（只含 `choice`），並加入：
+
+```json
+{
+  "language": "zh",
+  "surveyVersion": 2,
+  "surveyAnswers": [
+    { "featureId": "wifi", "functional": 0, "dysfunctional": 4 },
+    { "featureId": "early-check-in", "functional": 0, "dysfunctional": 2 },
+    { "featureId": "self-check-in", "functional": 2, "dysfunctional": 2 },
+    { "featureId": "promotions", "functional": 4, "dysfunctional": 0 }
+  ]
+}
+```
+
+`functional`、`dysfunctional` 必須是0–4的整數，依序代表喜歡、本來就應該、沒有特別感受、可以接受、不喜歡。前端不傳送問卷分類；後台須重新驗證四個固定屬性、反應值及分類，並按屬性彙整教師結果。情境分數同樣由後台重新計算。
+
+姓名和提交資料不放在此公開倉庫。教師後台的授權、資料儲存與彙整由獨立後台來源負責；本次前端修訂必須與配套後台一同驗證後發布。
 
 ## 檔案
 
-`index.html` 是學生入口；`classroom.html` 是投影入口。`assets/Kano_Classroom_QR.png` 和 `.svg` 可放入PPT；`assets/Kano_Classroom_Poster.png` 是課堂海報。
+`index.html` 是學生入口；`classroom.html` 是投影入口。`assets/Kano_Classroom_QR.png` 和 `.svg` 可放入課件。二維碼連結未變；既有 `assets/Kano_Classroom_Poster.png` 是先前海報，不因修改投影網頁而自動更新，不應作為本次新流程的說明。
 
-教師后台源码在課程目錄 `output/interactive/Kano_Teacher_Backend`，由 Sites 發布；此 GitHub 倉庫只保存公開學生頁和投影資源。
+教師後台來源在課程目錄 `output/interactive/Kano_Teacher_Backend`；此公開倉庫只保存學生頁、投影頁和公開資源。離線單檔練習是另一個用途版本，不自動由此修訂取代。
 
 ## References and licenses
 
